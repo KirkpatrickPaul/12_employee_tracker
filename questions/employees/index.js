@@ -2,6 +2,7 @@ const inquirer = require("inquirer");
 const add = require("./add.js");
 const changeRole = require("./changeRole.js")
 const addManager = require("../addManager")
+const db = require("../../db_queries")
 
 const employees = async function() {
   inquirer.prompt([{
@@ -17,6 +18,8 @@ const employees = async function() {
 }]).then(answer => {
   switch (answer) {
 case "See all employees":
+  db.allEmployees();
+  break;
   }
 })
 }

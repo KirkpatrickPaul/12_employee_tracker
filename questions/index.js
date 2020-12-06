@@ -18,7 +18,7 @@ const questions = function () {
         departments();
         break;
       default:
-        console.log("Have a nice day!");
+        console.log("Thank you, have a nice day!");
     }
   });
 };
@@ -85,7 +85,7 @@ const badstuff = {
       };
     },
     changeRole: function (employeesArr, rolesArr) {
-      // This function recieves employeesArr which will be an array filled with objects that have {firstName: w, lastName: x, manager: y, role: z} format.
+      // This function recieves employeesArr which will be an array filled with objects that have {name: x, manager: y, role: z} format.
       const employees = employeesArr.map((obj) => {
         const firstName = obj.firstName;
         const lastName = obj.lastName;
