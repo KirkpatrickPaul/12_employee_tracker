@@ -1,8 +1,10 @@
 const inquirer = require("inquirer");
 const add = require("./add.js");
 const changeRole = require("./changeRole.js")
+const addManager = require("../addManager")
 
-const employees = {
+const employees = async function() {
+  inquirer.prompt([{
   name: "employees",
   type: "list",
   message: "What would you like to do?",
@@ -12,7 +14,9 @@ const employees = {
     "Change an employee's role",
     "Change an employee's manager",
   ],
-  add: add,
-  changeManager: changeManager,
-  changeRole: changeRole,
+}]).then(answer => {
+  switch (answer) {
+case "See all employees":
+  }
+})
 }

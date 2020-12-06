@@ -11,7 +11,7 @@ const connection = mysql.createConnection({
 });
 connection.connect(function (err) {
   if (err) throw err;
-  //where to put my starting function
+  questions()
 });
 inquirer.prompt(questions.whatDo).then(function (answers) {
   if (answers.whatDo === "Employees") {

@@ -6,7 +6,7 @@ const whatDo = async function () {
       name: "whatDo",
       type: "list",
       message: "What would you like to look at and/or modify?",
-      choices: ["Employees", "Roles", "Departments"],
+      choices: ["Employees", "Roles", "Departments", "Nothing, I'm finished"],
     },
   ]);
 };

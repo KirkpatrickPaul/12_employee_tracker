@@ -1,11 +1,29 @@
-const inquirer = require("inquirer");
-const addManager = require("./addManager");
+// const inquirer = require("inquirer");
+// const addManager = require("./addManager");
 const whatDo = require("./whatDo");
 const employees = require("./employees");
 const roles = require("./roles");
-const departments = require("./departments")
+const departments = require("./departments");
 
-const questions = {
+const questions = function () {
+  whatDo().then((answer) => {
+    switch (answer) {
+      case "Employees":
+        employees();
+        break;
+      case "Roles":
+        roles();
+        break;
+      case "Departments":
+        departments();
+        break;
+      default:
+        console.log("Have a nice day!");
+    }
+  });
+};
+
+const badstuff = {
   whatDo: {
     name: "whatDo",
     type: "list",
