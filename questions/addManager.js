@@ -17,13 +17,15 @@ const addManager = function (
   const employees = employeesArr.map((elem) => elem.employee);
 
   inquirer
-    .prompt({
-      name: "manager",
-      type: "list",
-      message: "Who will be the new employee's manager?",
-      choices: employees,
-      default: roleDefault.role,
-    })
+    .prompt([
+      {
+        name: "manager",
+        type: "list",
+        message: "Who will be the new employee's manager?",
+        choices: employees,
+        default: roleDefault.role,
+      },
+    ])
     .then((answers) => {
       if (previousAnswers) {
         previousAnswers.manager = answers;
