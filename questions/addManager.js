@@ -21,7 +21,7 @@ const addManager = function (
       {
         name: "manager",
         type: "list",
-        message: "Who will be the new employee's manager?",
+        message: "Who will be the employee's manager?",
         choices: employees,
         default: roleDefault.role,
       },
