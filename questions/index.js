@@ -1,3 +1,10 @@
+const inquirer = require("inquirer");
+const addManager = require("./addManager");
+const whatDo = require("./whatDo");
+const employees = require("./employees");
+const roles = require("./roles");
+const departments = require("./departments")
+
 const questions = {
   whatDo: {
     name: "whatDo",
@@ -32,13 +39,13 @@ const questions = {
         },
         {
           name: "role",
-          type: "list",
+          type: "rawlist",
           message: "What role will the new employee serve in the company?",
           choices: roles,
         },
         {
           name: "manager",
-          type: "list",
+          type: "rawlist",
           message: "Who will be the new employee's manager?",
           choices: employeesArr,
           default: function () {
@@ -59,6 +66,48 @@ const questions = {
         default: roleDefault,
       };
     },
+    changeRole: function (employeesArr, rolesArr) {
+      // This function recieves employeesArr which will be an array filled with objects that have {firstName: w, lastName: x, manager: y, role: z} format.
+      const employees = employeesArr.map((obj) => {
+        const firstName = obj.firstName;
+        const lastName = obj.lastName;
+        firstName[0].toUpperCase() + firstName.slice(1);
+        lastName[0].toUpperCase() + lastName.slice(1);
+        return firstName + " " + lastName;
+      });
+      // This function receives rollsArr which will be an array filled with objects that have {role: x, manager: y} format.
+      const roles = rolesArr.map((obj) => obj.role);
+      return [
+        {
+          name: "employee",
+          type: "rawlist",
+          message: "Which employee's role do you wish to change?",
+          choices: employees,
+        },
+        {
+          name: "role",
+          type: "rawlist",
+          message: "What role will the new employee serve in the company?",
+          choices: roles,
+        },
+        {
+          name: "changeManager",
+          type: "confirm",
+          message: "Change employees manager as well?",
+        },
+        {
+          name: "manager",
+          type: "rawlist",
+          message: "Who will be the new employee's manager?",
+          choices: employees,
+          default: function () {
+            const dept = rolesArr.find((elem) => elem.role === answers.role);
+            return dept.manager;
+          },
+          when: answers.changeManager,
+        },
+      ];
+    },
   },
   roles: {
     name: "roles",
@@ -72,6 +121,7 @@ const questions = {
     message: "What would you like to do?",
     choices: [
       "See all departments",
+      "Add a department",
       "Add a role to a department",
       "Change a department's manager",
     ],
