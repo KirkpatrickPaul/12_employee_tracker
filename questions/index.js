@@ -93,7 +93,7 @@ const badstuff = {
         lastName[0].toUpperCase() + lastName.slice(1);
         return firstName + " " + lastName;
       });
-      // This function receives rollsArr which will be an array filled with objects that have {role: x, manager: y} format.
+      // This function receives rollsArr which will be an array filled with objects that have {role: x, department: y, manager: z} format.
       const roles = rolesArr.map((obj) => obj.role);
       return [
         {

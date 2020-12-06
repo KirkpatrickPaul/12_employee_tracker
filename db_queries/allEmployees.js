@@ -8,7 +8,7 @@ function capFirstLetter(string) {
 const allEmployees = function () {
   connection.query(
     "SELECT * FROM employees LEFT OUTER JOIN roles ON employees.role_id = roles.id;",
-    function (err, res) {
+    (err, res) => {
       if (err) {
         throw err;
       }
