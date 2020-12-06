@@ -23,9 +23,13 @@ const allEmployees = function () {
         const managerNameL = capFirstLetter(empManager.last_name);
 
         return {
+          id: emp.id,
           name: nameF + " " + nameL,
+          first_name: nameF,
+          last_name: nameL,
           manager: managerNameF + " " + managerNameL,
-          role: emp.title,
+          manager_id: emp.manager_id,
+          role_id: emp.title,
         };
       });
       return prettified;

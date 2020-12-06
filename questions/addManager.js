@@ -1,20 +1,19 @@
 const inquirer = require("inquirer");
 
-// rolesArr should be an array filled with objects that have {role: x, manager: y} format.
-// employeesArr should be an array filled with objects that have {employee: x, manager: y, role: z} format.
+// rolesArr should be an array filled with objects that have {id: x, role: y, manager: z} format.
+// employeesArr should be an array filled with objects that have {id: w, name: x, manager: y, role_id: z} format.
 const addManager = function (
   rolesArr,
   employeesArr,
-  role = "",
-  previousAnswers = ""
+  role = "", // should be the recommended role's id number if applicable
+  previousAnswers = "" //for passing information to modifyEmployee
 ) {
-  let roleDefault;
+  let roleIdx = 0;
   if (role) {
-    roleDefault = rolesArr.find((elem) => elem.role === role);
-  } else {
-    roleDefault = rolesArr[0];
+    roleIdx = rolesArr.findIndex((elem) => elem.id === role);
   }
-  const employees = employeesArr.map((elem) => elem.employee);
+  const roleManager = rolesArr[roleIdx].manager;
+  const employees = employeesArr.map((elem) => elem.name);
 
   inquirer
     .prompt([
@@ -23,15 +22,18 @@ const addManager = function (
         type: "list",
         message: "Who will be the employee's manager?",
         choices: employees,
-        default: roleDefault.role,
+        default: roleManager,
       },
     ])
     .then((answers) => {
+      const idx = employees.findIndex((emp) => emp === answers.manager);
+      const manager = employeesArr[idx];
       if (previousAnswers) {
-        previousAnswers.manager = answers;
+        previousAnswers.employee.manager_id = manager.id;
+        previousAnswers.employee.manager = manager.manager;
         return previousAnswers;
       } else {
-        return answers;
+        return manager;
       }
     });
 };

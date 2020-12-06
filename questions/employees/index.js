@@ -39,12 +39,11 @@ const employees = async function () {
           break;
         case "Change an employee's manager":
           chooseEmployee(db.allEmployees()).then((ans) => {
-            addManager(db.allRoles(), ans.all, ans.employee.role, ans.employee);
             db.modifyEmployee(
               addManager(
                 db.allRoles(),
                 ans.all,
-                ans.employee.role,
+                ans.employee.role_id,
                 ans.employee
               )
             );
