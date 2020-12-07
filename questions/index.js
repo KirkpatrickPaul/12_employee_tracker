@@ -1,27 +1,35 @@
-// const inquirer = require("inquirer");
-// const addManager = require("./addManager");
-const whatDo = require("./whatDo");
+const inquirer = require("inquirer");
 const employees = require("./employees");
 const roles = require("./roles");
 const departments = require("./departments");
 
 const questions = function () {
-  whatDo().then((answer) => {
-    switch (answer) {
-      case "Employees":
-        employees();
-        break;
-      case "Roles":
-        roles();
-        break;
-      case "Departments":
-        departments();
-        break;
-      default:
-        console.log("Thank you, have a nice day!");
-    }
-  });
+  inquirer
+    .prompt([
+      {
+        name: "whatDo",
+        type: "list",
+        message: "What would you like to look at and/or modify?",
+        choices: ["Employees", "Roles", "Departments", "Nothing, I'm finished"],
+      },
+    ])
+    .then(function (ans) {
+      switch (ans.whatDo) {
+        case "Employees":
+          employees();
+          break;
+        case "Roles":
+          roles();
+          break;
+        case "Departments":
+          departments();
+          break;
+        default:
+          console.log("Thank you, have a nice day!");
+      }
+    });
 };
+module.exports = questions;
 
 const badstuff = {
   whatDo: {
@@ -145,4 +153,3 @@ const badstuff = {
     ],
   },
 };
-module.exports = questions;

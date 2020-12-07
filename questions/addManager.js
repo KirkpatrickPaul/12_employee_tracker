@@ -6,7 +6,8 @@ const addManager = function (
   rolesArr,
   employeesArr,
   role = "", // should be the recommended role's id number if applicable
-  previousAnswers = "" //for passing information to modifyEmployee
+  previousAnswers = "", //for passing information to modifyEmployee
+  forWhat = ""
 ) {
   let roleIdx = 0;
   if (role) {
@@ -33,9 +34,12 @@ const addManager = function (
         previousAnswers.employee.manager_id = manager.id;
         previousAnswers.employee.manager = manager.manager;
         previousAnswers.employee.role_id = roleID;
-        return previousAnswers;
       } else {
-        return manager;
+        previousAnswers = manager;
+      }
+      switch (forWhat) {
+        case "newEmployee":
+          
       }
     });
 };

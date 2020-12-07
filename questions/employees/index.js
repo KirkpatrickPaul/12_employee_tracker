@@ -2,10 +2,10 @@ const inquirer = require("inquirer");
 const newEmployee = require("./newEmployee");
 const chooseEmployee = require("./chooseEmployee");
 const addManager = require("../addManager");
-const db = require("../../db_queries");
+const db = require("../../server.js");
 const questions = require("../index");
 
-const employees = async function () {
+const employees = function () {
   inquirer
     .prompt([
       {
@@ -21,16 +21,18 @@ const employees = async function () {
       },
     ])
     .then((answer) => {
-      switch (answer) {
+      switch (answer.employees) {
         case "See all employees":
-          console.table(db.allEmployees());
+          db.allEmployees(true);
           questions();
           break;
         case "Add an employee":
           const rolesArr = db.allRoles()();
           db.addEmployee(
             newEmployee(rolesArr).then((ans) =>
-              addManager(rolesArr, db.allEmployees(), ans.role, {employee: ans})
+              addManager(rolesArr, db.allEmployees(), ans.role, {
+                employee: ans,
+              })
             )
           );
           questions();
@@ -59,4 +61,4 @@ const employees = async function () {
       }
     });
 };
-module.exports = employees;
+
