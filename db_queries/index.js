@@ -2,13 +2,13 @@ const connection = require("../server");
 const allEmployees = require("./allEmployees");
 const allRoles = require("./allRoles");
 const modifyEmployee = require("./modifyEmployee");
-const chooseEmployee = require("./chooseEmployee");
+const addEmployee = require("./addEmployee");
 
 const db = {
   allEmployees: allEmployees,
   allRoles: allRoles,
   modifyEmployee: modifyEmployee,
-  chooseEmployee: chooseEmployee
+  addEmployee: addEmployee,
 };
 
 module.exports = db;

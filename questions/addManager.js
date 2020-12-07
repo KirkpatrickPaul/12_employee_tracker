@@ -10,10 +10,11 @@ const addManager = function (
 ) {
   let roleIdx = 0;
   if (role) {
-    roleIdx = rolesArr.findIndex((elem) => elem.id === role);
+    roleIdx = rolesArr.findIndex((elem) => elem.role === role);
   }
   const roleManager = rolesArr[roleIdx].manager;
   const employees = employeesArr.map((elem) => elem.name);
+  const roleID = rolesArr[roleIdx].id;
 
   inquirer
     .prompt([
@@ -31,6 +32,7 @@ const addManager = function (
       if (previousAnswers) {
         previousAnswers.employee.manager_id = manager.id;
         previousAnswers.employee.manager = manager.manager;
+        previousAnswers.employee.role_id = roleID;
         return previousAnswers;
       } else {
         return manager;

@@ -1,6 +1,5 @@
 const inquirer = require("inquirer");
-const add = require("./add");
-const modifyEmployee = require("./modifyEmployee");
+const newEmployee = require("./newEmployee");
 const chooseEmployee = require("./chooseEmployee");
 const addManager = require("../addManager");
 const db = require("../../db_queries");
@@ -28,7 +27,12 @@ const employees = async function () {
           questions();
           break;
         case "Add an employee":
-          add();
+          const rolesArr = db.allRoles()();
+          db.addEmployee(
+            newEmployee(rolesArr).then((ans) =>
+              addManager(rolesArr, db.allEmployees(), ans.role, {employee: ans})
+            )
+          );
           questions();
           break;
         case "Change an employee's role":
@@ -43,7 +47,7 @@ const employees = async function () {
               addManager(
                 db.allRoles(),
                 ans.all,
-                ans.employee.role_id,
+                ans.employee.role,
                 ans.employee
               )
             );
