@@ -107,6 +107,7 @@ const modifyEmployee = function (employee) {
       if (err) {
         throw err;
       }
+      questions();
     }
   );
 };
@@ -226,13 +227,17 @@ const newEmployee = async function (rolesArr) {
 // employeesArr should be an array filled with objects that have {id: w, name: x, manager: y, role_id: z} format.
 const addManager = function (
   rolesArr,
-  employeesArr,
-  role = "", // should be the recommended role's id number if applicable
-  previousAnswers = "" //for passing information to modifyEmployee
+  everyEmployee,
+  cb = "", //for passing information to modifyEmployee
+  role = "" // should be the recommended role's id number if applicable
 ) {
   let roleIdx = 0;
   if (role) {
     roleIdx = rolesArr.findIndex((elem) => elem.role === role);
+  }
+  let employeesArr = everyEmployee;
+  if (everyEmployee.all) {
+    employeesArr = everyEmployee.all;
   }
   const roleManager = rolesArr[roleIdx].manager;
   const employees = employeesArr.map((elem) => elem.name);
@@ -243,21 +248,23 @@ const addManager = function (
       {
         name: "manager",
         type: "list",
-        message: "Who will be the employee's manager?",
+        message: "Who will be the new manager?",
         choices: employees,
         default: roleManager,
       },
     ])
     .then((answers) => {
-      const idx = employees.findIndex((emp) => emp === answers.manager);
-      const manager = employeesArr[idx];
-      if (previousAnswers) {
-        previousAnswers.employee.manager_id = manager.id;
-        previousAnswers.employee.manager = manager.manager;
-        previousAnswers.employee.role_id = roleID;
-        return previousAnswers;
+      const newManager = employeesArr.find(
+        (emp) => emp.name === answers.manager
+      );
+      if (everyEmployee.employee) {
+        everyEmployee.employee.manager_id = newManager.id;
+        everyEmployee.employee.manager = newManager.name;
+        cb(everyEmployee.employee);
+      } else if (role) {
+        cb({ id: role, manager_id: newManager.id });
       } else {
-        return manager;
+        cb(newManager);
       }
     });
 };
@@ -320,21 +327,14 @@ const changeRole = function (empObj) {
           type: "confirm",
           message: "Change employees manager as well?",
         },
-        {
-          name: "manager",
-          type: "rawlist",
-          message: "Who should be the employee's new manager?",
-          choices: employees,
-          when: (answers) => answers.confirm,
-        },
       ])
       .then((ans) => {
-        const employee = empObj.employee;
         roleObj = rolesArr.find((role) => role.role === ans.role);
-        employee.role_id = roleObj.role_id;
-        if (ans.manager) {
-          const newManager = empObj.all.find((emp) => emp.name === ans.manager);
-          employee.manager_id = newManager.id;
+        empObj.employee.role_id = roleObj.role_id;
+        if (ans.changeManager) {
+          addManager(empObj, rolesArr, modifyEmployee, roleObj.role_id);
+        } else {
+          modifyEmployee(empObj.employee);
         }
       });
   };
