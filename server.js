@@ -166,6 +166,7 @@ const chooseEmployee = function (employeeArr, cb) {
 
 const newEmployee = async function (rolesArr) {
   const roles = rolesArr.map((obj) => obj.role);
+  let employeeArr = allEmployees((data, _) => (employeeArr = data), 1);
   inquirer
     .prompt([
       {
@@ -186,41 +187,37 @@ const newEmployee = async function (rolesArr) {
       },
     ])
     .then((ans) => {
-      allEmployees(function (employeesArr, data) {
-        const employees = employeesArr.map((elem) => elem.name);
-        const defaultManager = rolesArr.find((role) => data.role === role.role);
-        inquirer
-          .prompt([
-            {
-              name: "manager",
-              type: "list",
-              message: "Who will be the employee's manager?",
-              choices: employees,
-              default: defaultManager.manager,
-            },
-          ])
-          .then((answers) => {
-            const managerID = employeesArr.find(
-              (employee) => employee.name === answers.manager
-            );
-            const roleID = rolesArr.find((rol) => rol.role === ans.role);
-            connection.query(
-              "INSERT INTO employees SET ?",
-              {
-                first_name: data.first_name,
-                last_name: data.last_name,
-                role_id: roleID.id,
-                manager_id: managerID.id,
-              },
-              (err, _) => {
-                if (err) {
-                  throw err;
-                }
-              }
-            );
-            questions();
-          });
-      }, ans);
+      const nameF = capFirstLetter(ans.first_name);
+      const nameL = capFirstLetter(ans.last_name);
+      const roleID = rolesArr.find((role) => role.id === ans.role);
+      const employeeObj = {
+        all: employeeArr,
+        employee: {
+          name: nameF + " " + nameL,
+          first_name: nameF,
+          last_name: nameL,
+          role: ans.role,
+          role_id: roleID,
+        },
+      };
+      const newEmployeeCB = function (data) {
+        connection.query(
+          "INSERT INTO employees SET ?",
+          {
+            first_name: data.first_name,
+            last_name: data.last_name,
+            role_id: data.role_id,
+            manager_id: data.manager_id,
+          },
+          (err, _) => {
+            if (err) {
+              throw err;
+            }
+          }
+        );
+        questions();
+      };
+      addManager(rolesArr, employeeObj, newEmployeeCB, roleID);
     });
 };
 
@@ -356,7 +353,7 @@ const roles = function () {
           allEmployees(chooseEmployee, changeRole);
           break;
         case "Add a new role":
-          allEmployees(chooseEmployee, managerHandler);
+          allDepartments(newRole, addManager);
           break;
         default:
           end();
@@ -364,6 +361,21 @@ const roles = function () {
     });
 };
 
-const newRole = function (deptArr) {
-  console.log("deptArr :>> ", deptArr);
+const newRole = function (deptArr, cb) {
+  const departments = deptArr.map((dept) => dept.name);
+  inquirer
+    .prompt([
+      {
+        name: "newRole",
+        type: "input",
+        message: "What will the new role be called?",
+      },
+      {
+        name: "department",
+        type: "rawlist",
+        message: "To which department will the new role belong?",
+        choices: departments,
+      },
+    ])
+    .then();
 };
