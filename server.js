@@ -111,23 +111,6 @@ const modifyEmployee = function (employee) {
   );
 };
 
-// const addEmployee = function (employeeObj) {
-//   connection.query(
-//     "INSERT INTO employees SET ?",
-//     {
-//       first_name: employeeObj.employee.first_name,
-//       last_name: employeeObj.employee.last_name,
-//       role_id: employeeObj.employee.role_id,
-//       manager_id: employeeObj.employee.manager_id,
-//     },
-//     (err, data) => {
-//       if (err) {
-//         throw err;
-//       }
-//     }
-//   );
-// };
-
 const end = function () {
   connection.end();
   console.log("Thank you, have a nice day!");
@@ -160,7 +143,7 @@ const questions = function () {
     });
 };
 
-const chooseEmployee = function (employeeArr) {
+const chooseEmployee = function (employeeArr, cb) {
   const employees = employeeArr.map((elem) => elem.name);
   inquirer
     .prompt([
@@ -175,7 +158,7 @@ const chooseEmployee = function (employeeArr) {
       const idx = employeeArr.findIndex(
         (elem) => elem.name === answer.employee
       );
-      return { employee: employeeArr[idx], all: employeeArr };
+      cb({ employee: employeeArr[idx], all: employeeArr });
     });
 };
 
@@ -303,10 +286,7 @@ const employees = function () {
           allRoles(newEmployee);
           break;
         case "Change an employee's role":
-          chooseEmployee(allEmployees()).then((ans) => {
-            modifyEmployee(ans.employee);
-          });
-          questions();
+          allEmployees(chooseEmployee, changeRole);
           break;
         case "Change an employee's manager":
           chooseEmployee(allEmployees()).then((ans) => {
@@ -320,4 +300,42 @@ const employees = function () {
           questions();
       }
     });
+};
+
+const changeRole = function (empObj) {
+  allRoles(changeRoleCB, empObj);
+  const changeRoleCB = (rolesArr, emps) => {
+    const roles = rolesArr.map((roleObj) => roleObj.role);
+    const employees = emps.all.map((employee) => employee.name);
+    inquirer
+      .prompt([
+        {
+          name: "role",
+          type: "rawlist",
+          message: "What new role will the employee serve in the company?",
+          choices: roles,
+        },
+        {
+          name: "changeManager",
+          type: "confirm",
+          message: "Change employees manager as well?",
+        },
+        {
+          name: "manager",
+          type: "rawlist",
+          message: "Who should be the employee's new manager?",
+          choices: employees,
+          when: (answers) => answers.confirm,
+        },
+      ])
+      .then((ans) => {
+        const employee = empObj.employee;
+        roleObj = rolesArr.find((role) => role.role === ans.role);
+        employee.role_id = roleObj.role_id;
+        if (ans.manager) {
+          const newManager = empObj.all.find((emp) => emp.name === ans.manager);
+          employee.manager_id = newManager.id;
+        }
+      });
+  };
 };
