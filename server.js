@@ -18,7 +18,7 @@ function capFirstLetter(string) {
   return string[0].toUpperCase() + string.slice(1);
 }
 
-const allEmployees = function (cb, data = "") {
+const allEmployees = function (cb, ...data) {
   connection.query(
     "SELECT * FROM employees LEFT OUTER JOIN roles ON employees.role_id = roles.id;",
     (err, res) => {
@@ -44,7 +44,7 @@ const allEmployees = function (cb, data = "") {
         return obj;
       });
       if (data) {
-        cb(prettified, data);
+        cb(prettified, ...data);
       } else {
         cb(prettified);
         questions();
@@ -53,7 +53,7 @@ const allEmployees = function (cb, data = "") {
   );
 };
 
-const allRoles = function (cb, data = "") {
+const allRoles = function (cb, ...data) {
   connection.query(
     `SELECT * FROM roles AS rol
   LEFT OUTER JOIN departments AS dept 
@@ -80,9 +80,10 @@ const allRoles = function (cb, data = "") {
         };
       });
       if (data) {
-        cb(prettified, data);
+        cb(prettified, ...data);
       } else {
         cb(prettified);
+        questions();
       }
     }
   );
@@ -223,14 +224,11 @@ const newEmployee = async function (rolesArr) {
     });
 };
 
-// rolesArr should be an array filled with objects that have {id: x, role: y, manager: z} format.
-// employeesArr should be an array filled with objects that have {id: w, name: x, manager: y, role_id: z} format.
-const addManager = function (
-  rolesArr,
-  everyEmployee,
-  cb = "", //for passing information to modifyEmployee
-  role = "" // should be the recommended role's id number if applicable
-) {
+const managerHandler = function (empObj) {
+  allRoles(addManager, empObj, modifyEmployee);
+};
+
+const addManager = function (rolesArr, everyEmployee, cb = "", role = "") {
   let roleIdx = 0;
   if (role) {
     roleIdx = rolesArr.findIndex((elem) => elem.role === role);
@@ -296,21 +294,15 @@ const employees = function () {
           allEmployees(chooseEmployee, changeRole);
           break;
         case "Change an employee's manager":
-          chooseEmployee(allEmployees()).then((ans) => {
-            modifyEmployee(
-              addManager(allRoles(), ans.all, ans.employee.role, ans.employee)
-            );
-          });
-          questions();
+          allEmployees(chooseEmployee, managerHandler);
           break;
         default:
-          questions();
+          end();
       }
     });
 };
 
 const changeRole = function (empObj) {
-  allRoles(changeRoleCB, empObj);
   const changeRoleCB = (rolesArr, emps) => {
     const roles = rolesArr.map((roleObj) => roleObj.role);
     const employees = emps.all.map((employee) => employee.name);
@@ -332,10 +324,46 @@ const changeRole = function (empObj) {
         roleObj = rolesArr.find((role) => role.role === ans.role);
         empObj.employee.role_id = roleObj.role_id;
         if (ans.changeManager) {
-          addManager(empObj, rolesArr, modifyEmployee, roleObj.role_id);
+          addManager(rolesArr, empObj, modifyEmployee, roleObj.role_id);
         } else {
           modifyEmployee(empObj.employee);
         }
       });
   };
+  allRoles(changeRoleCB, empObj);
+};
+
+const roles = function () {
+  inquirer
+    .prompt([
+      {
+        name: "roles",
+        type: "list",
+        message: "What would you like to do?",
+        choices: [
+          "See all roles",
+          "Change an employee's role",
+          "Add a new role",
+        ],
+      },
+    ])
+    .then((answer) => {
+      switch (answer.roles) {
+        case "See all roles":
+          allRoles(console.table);
+          break;
+        case "Change an employee's role":
+          allEmployees(chooseEmployee, changeRole);
+          break;
+        case "Add a new role":
+          allEmployees(chooseEmployee, managerHandler);
+          break;
+        default:
+          end();
+      }
+    });
+};
+
+const newRole = function (deptArr) {
+  console.log("deptArr :>> ", deptArr);
 };
