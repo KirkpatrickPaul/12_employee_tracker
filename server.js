@@ -353,7 +353,7 @@ const roles = function () {
           allEmployees(chooseEmployee, changeRole);
           break;
         case "Add a new role":
-          allDepartments(newRole, addManager);
+          allDepartments(newRole);
           break;
         default:
           end();
@@ -361,7 +361,7 @@ const roles = function () {
     });
 };
 
-const newRole = function (deptArr, cb) {
+const newRole = function (deptArr) {
   const departments = deptArr.map((dept) => dept.name);
   inquirer
     .prompt([
@@ -377,5 +377,20 @@ const newRole = function (deptArr, cb) {
         choices: departments,
       },
     ])
-    .then();
+    .then((ans) => {
+      roleDept = deptArr.find((dept) => dept.name === ans.department);
+      connection.query(
+        "INSERT INTO employees SET ?",
+        {
+          title: ans.newRole,
+          department_id: roleDept.id,
+        },
+        (err, _) => {
+          if (err) {
+            throw err;
+          }
+        }
+      );
+      questions();
+    });
 };
