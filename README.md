@@ -12,7 +12,7 @@ An application to allow users to manage their business's employees, roles, and d
 
 - [Questions and Reporting](#Questions-and-Reporting)
 
--[A Special Apology](#A-Special-Apology)
+- [A Special Apology](#A-Special-Apology)
 
 ## Description
 
