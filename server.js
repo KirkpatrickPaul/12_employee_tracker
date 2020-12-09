@@ -426,3 +426,65 @@ const newRole = function (deptArr, cb) {
     });
 };
 
+const departments = function () {
+  inquirer
+    .prompt([
+      {
+        name: "employees",
+        type: "list",
+        message: "What would you like to do?",
+        choices: [
+          "See all departments",
+          "Add a department",
+          "Add a role to a department",
+          "Change a department's manager",
+        ],
+      },
+    ])
+    .then((answer) => {
+      switch (answer.employees) {
+        case "See all departments":
+          allDepartments(console.table);
+          break;
+        case "Add a department":
+          allEmployees(newDepartment);
+          break;
+        case "Add a role to a department":
+          allDepartments(newRole, questions);
+          break;
+        case "Change a department's manager":
+          allEmployees(chooseEmployee, managerHandler);
+          break;
+        default:
+          end();
+      }
+    });
+};
+
+const newDepartment = function (employeeArr) {
+  inquirer
+    .prompt([
+      {
+        name: "department",
+        type: "input",
+        message: "What is the new department called?",
+      },
+    ])
+    .then((ans) => {
+      const newDeptCB = function (manager) {
+        connection.query(
+          "INSERT INTO departments SET ?",
+          {
+            name: ans.department,
+            manager_id: manager.id,
+          },
+          (err, _) => {
+            if (err) throw err;
+            console.log("Success! New Department has been added.");
+            questions();
+          }
+        );
+      };
+      allRoles(addManager, employeeArr, newDeptCB);
+    });
+};
