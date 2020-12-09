@@ -485,7 +485,7 @@ const newDepartment = function (employeeArr, cb) {
     ])
     .then((ans) => {
       const answerObj = ans;
-      answerObj.func = function (managerObj, cb) {
+      const ModifyDept = function (managerObj, cb) {
         connection.query(
           "INSERT INTO departments SET name = ?, manager_id = ?",
           [this.department, managerObj.id],
@@ -494,12 +494,12 @@ const newDepartment = function (employeeArr, cb) {
               throw err;
             }
             console.log("Success! New Department has been added.");
-            cb();
+            questions();
           }
         );
       };
-      const newfunc = answerObj.func.bind(answerObj);
-      cb(addManager, employeeArr, newfunc);
+      const boundModify = answerObj.func.bind(answerObj);
+      cb(addManager, employeeArr, boundModify);
     });
 };
 
@@ -518,8 +518,7 @@ const chooseDepartment = function (departmentArr, cb) {
       const deptObj = departmentArr.find(
         (dept) => dept.department === ans.department
       );
-      deptObj.cb = cb;
-      deptObj.func = function (managerObj) {
+      const updateDept = function (managerObj) {
         connection.query(
           `UPDATE departments SET 
         name = ?
@@ -534,7 +533,8 @@ const chooseDepartment = function (departmentArr, cb) {
             questions();
           }
         );
-      }.bind(this);
-      allEmployees(managerHandler, deptObj.func);
+      };
+      const boundUpdateDept = updateDept.bind(deptObj);
+      allEmployees(managerHandler, boundUpdateDept);
     });
 };
