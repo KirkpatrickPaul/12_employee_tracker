@@ -53,6 +53,36 @@ const allEmployees = function (cb, ...data) {
   );
 };
 
+const allDepartments = function (cb, ...data) {
+  connection.query(
+    `SELECT 
+    d.id AS id,
+    d.name AS department,
+    d.manager_id AS manager_id,
+    e.first_name AS manager_first_name,
+    e.last_name AS manager_last_name
+    FROM departments AS d
+    LEFT OUTER JOIN employees AS e
+    ON d.manager_id = e.id;`,
+    (err, res) => {
+      if (err) throw err;
+      const prettified = res.map((dept) => {
+        const nameF = capFirstLetter(dept.manager_first_name);
+        const nameL = capFirstLetter(dept.manager_last_name);
+        const deptObj = dept;
+        deptObj.manager_name = nameF + " " + nameL;
+        return deptObj;
+      });
+      if (data) {
+        return cb(prettified, ...data);
+      } else {
+        cb(prettified);
+        questions();
+      }
+    }
+  );
+};
+
 const allRoles = function (cb, ...data) {
   connection.query(
     `SELECT * FROM roles AS rol
@@ -64,9 +94,7 @@ const allRoles = function (cb, ...data) {
   ON dep.manager_id = emp.id) AS man
   ON man.id = dept.manager_id;`,
     function (err, res) {
-      if (err) {
-        throw err;
-      }
+      if (err) throw err;
       const prettified = res.map((rol) => {
         const nameF = capFirstLetter(rol.first_name);
         const nameL = capFirstLetter(rol.last_name);
@@ -108,6 +136,7 @@ const modifyEmployee = function (employee) {
       if (err) {
         throw err;
       }
+      console.log("Success! Employee's information has been changed.");
       questions();
     }
   );
@@ -164,7 +193,7 @@ const chooseEmployee = function (employeeArr, cb) {
     });
 };
 
-const newEmployee = async function (rolesArr) {
+const newEmployee = function (rolesArr) {
   const roles = rolesArr.map((obj) => obj.role);
   let employeeArr = allEmployees((data, _) => (employeeArr = data), 1);
   inquirer
@@ -215,6 +244,7 @@ const newEmployee = async function (rolesArr) {
             }
           }
         );
+        console.log("Success! New employee has been created.");
         questions();
       };
       addManager(rolesArr, employeeObj, newEmployeeCB, roleID);
@@ -353,7 +383,7 @@ const roles = function () {
           allEmployees(chooseEmployee, changeRole);
           break;
         case "Add a new role":
-          allDepartments(newRole);
+          allDepartments(newRole, questions);
           break;
         default:
           end();
@@ -361,8 +391,8 @@ const roles = function () {
     });
 };
 
-const newRole = function (deptArr) {
-  const departments = deptArr.map((dept) => dept.name);
+const newRole = function (deptArr, cb) {
+  const departments = deptArr.map((dept) => dept.department);
   inquirer
     .prompt([
       {
@@ -378,9 +408,9 @@ const newRole = function (deptArr) {
       },
     ])
     .then((ans) => {
-      roleDept = deptArr.find((dept) => dept.name === ans.department);
+      roleDept = deptArr.find((dept) => dept.department === ans.department);
       connection.query(
-        "INSERT INTO employees SET ?",
+        "INSERT INTO roles SET ?",
         {
           title: ans.newRole,
           department_id: roleDept.id,
@@ -389,8 +419,10 @@ const newRole = function (deptArr) {
           if (err) {
             throw err;
           }
+          console.log("Success! New Role has been added.");
+          cb();
         }
       );
-      questions();
     });
 };
+
