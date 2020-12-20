@@ -485,7 +485,6 @@ const newDepartment = function (employeeArr, cb) {
     ])
     .then((ans) => {
       const answerObj = ans;
-      console.log("answerObj :>> ", answerObj);
       answerObj.ModifyDept = function (managerObj, cb) {
         connection.query(
           "INSERT INTO departments SET name = ?, manager_id = ?",
