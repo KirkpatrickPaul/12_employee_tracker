@@ -10,6 +10,8 @@ An application to allow users to manage their business's employees, roles, and d
 
 - [Usage Guide](#Usage-Guide)
 
+- [Demonstration](#Demonstration)
+
 - [Questions and Reporting](#Questions-and-Reporting)
 
 - [A Special Apology](#A-Special-Apology)
@@ -33,6 +35,10 @@ node server.js
 ```
 
 The program should prompt for answers with relevant questions. A general question about what type of thing the user wants to do will be the first question. Once he/she decides whether the goal he/she has has to do with employees, roles, or departments, a second question will prompt the user for what precisely it is he/she wants to do. Once there, further questions will allow the user to make as many changes as necessary.
+
+## Demonstration
+
+A demo video can be found [here](https://drive.google.com/file/d/15JpAJn28F0P3VC8Fw80lCZTMQCJp2Aqx/view) that walks through some of the functionality of the employee tracker app.
 
 ## Questions and Reporting
 
