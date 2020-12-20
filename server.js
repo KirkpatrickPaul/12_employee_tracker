@@ -203,7 +203,7 @@ const chooseEmployee = function (employeeArr, cb, ...data) {
     });
 };
 
-const newEmployee = function (rolesArr) {
+const newEmployee = function (rolesArr, cb) {
   const roles = rolesArr.map((obj) => obj.role);
   let employeeArr = allEmployees((data, _) => (employeeArr = data), 1);
   inquirer
@@ -255,7 +255,7 @@ const newEmployee = function (rolesArr) {
           }
         );
         console.log("Success! New employee has been created.");
-        questions();
+        cb();
       };
       addManager(rolesArr, employeeObj, newEmployeeCB, roleObj.role);
     });
@@ -328,7 +328,7 @@ const employees = function () {
           allEmployees(console.table);
           break;
         case "Add an employee":
-          allRoles(newEmployee);
+          allRoles(newEmployee, questions);
           break;
         case "Change an employee's role":
           allEmployees(chooseEmployee, changeRole);
